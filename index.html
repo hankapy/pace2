@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pace</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            background-color: #f0f0f0;
+        }
+
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 1em;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 1.5em;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Juoksulaskuri</h1>
+    
+    <div class="section">
+        <p>Syötä nopeus (km/h)</p>
+        <input type="number" id="speedInput" placeholder="Esim. 10">
+        <br>
+        <button onclick="convertSpeedToPace()">Laske keskivauhti</button>
+        <div class="result" id="paceResult"></div>
+    </div>
+
+    <div class="section">
+        <p>Syötä keskivauhti (min/km)</p>
+        <input type="text" id="paceInput" placeholder="Esim. 5:00">
+        <br>
+        <button onclick="convertPaceToSpeed()">Laske nopeus</button>
+        <div class="result" id="speedResult"></div>
+    </div>
+
+    <div class="section">
+        <p>Syötä matka (km) ja keskivauhti (min/km)</p>
+        <input type="number" id="distanceInput" placeholder="Esim. 10">
+        <input type="text" id="paceForTimeInput" placeholder="Esim. 5:00">
+        <br>
+        <button onclick="calculateTime()">Laske aika</button>
+        <div class="result" id="timeResult"></div>
+    </div>
+
+    <div class="section">
+        <p>Syötä matka (km) ja tavoiteaika (hh:mm)</p>
+        <input type="number" id="distanceForGoalInput" placeholder="Esim. 10">
+        <input type="text" id="goalTimeInput" placeholder="Esim. 00:50">
+        <br>
+        <button onclick="calculateGoalPace()">Laske tavoitevauhti</button>
+        <div class="result" id="goalPaceResult"></div>
+    </div>
+
+    <script>
+        function convertSpeedToPace() {
+            const speed = parseFloat(document.getElementById('speedInput').value);
+            if (speed > 0) {
+                const pace = 60 / speed;
+                const minutes = Math.floor(pace);
+                const seconds = Math.round((pace - minutes) * 60);
+                const formattedSeconds = seconds < 10 ? '0' + seconds : seconds;
+                document.getElementById('paceResult').textContent = `Keskivauhti: ${minutes}:${formattedSeconds} min/km`;
+            } else {
+                document.getElementById('paceResult').textContent = "Anna positiivinen nopeus.";
+            }
+        }
+
+        function convertPaceToSpeed() {
+            const pace = document.getElementById('paceInput').value;
+            const [min, sec] = pace.split(':').map(Number);
+            if (!isNaN(min) && !isNaN(sec)) {
+                const speed = 60 / (min + sec / 60);
+                document.getElementById('speedResult').textContent = `Nopeus: ${speed.toFixed(2)} km/h`;
+            } else {
+                document.getElementById('speedResult').textContent = "Anna oikea keskivauhti.";
+            }
+        }
+
+        function calculateTime() {
+            const distance = parseFloat(document.getElementById('distanceInput').value);
+            const pace = document.getElementById('paceForTimeInput').value;
+            const [min, sec] = pace.split(':').map(Number);
+
+            if (!isNaN(distance) && !isNaN(min) && !isNaN(sec)) {
+                const totalMinutes = distance * (min + sec / 60);
+                const hours = Math.floor(totalMinutes / 60);
+                const minutes = Math.round(totalMinutes % 60);
+                document.getElementById('timeResult').textContent = `Aika: ${hours} h ${minutes} min`;
+            } else {
+                document.getElementById('timeResult').textContent = "Anna oikeat arvot.";
+            }
+        }
+
+        function calculateGoalPace() {
+            const distance = parseFloat(document.getElementById('distanceForGoalInput').value);
+            const goalTime = document.getElementById('goalTimeInput').value;
+            const [hours, minutes] = goalTime.split(':').map(Number);
+
+            if (!isNaN(distance) && !isNaN(hours) && !isNaN(minutes)) {
+                const totalMinutes = hours * 60 + minutes;
+                const pace = totalMinutes / distance;
+                const paceMin = Math.floor(pace);
+                const paceSec = Math.round((pace - paceMin) * 60);
+                const formattedSeconds = paceSec < 10 ? '0' + paceSec : paceSec;
+                const speed = 60 / pace;
+                document.getElementById('goalPaceResult').textContent = `Tavoitevauhti: ${paceMin}:${formattedSeconds} min/km (${speed.toFixed(2)} km/h)`;
+            } else {
+                document.getElementById('goalPaceResult').textContent = "Anna oikeat arvot.";
+            }
+        }
+    </script>
+</body>
+</html>
